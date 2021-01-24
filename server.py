@@ -169,7 +169,7 @@ def editmodel():
 @app.route('/appenddenselayer', methods = ["POST"])
 def appenddenselayer():
     apikey = request.headers.get('apikey') 
-    return
+    return make_response("Success", 202)
 
 
 @app.route('/deletemodel', methods = ["DELETE"])
