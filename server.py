@@ -5,6 +5,7 @@ import hashlib
 import tensorflow as tf
 from tensorflow import keras 
 import numpy as np 
+import cv2
 import matplotlib.pyplot as plot
 from flask_mongoengine import MongoEngine
 from math import *
@@ -13,6 +14,8 @@ import string
 from datetime import datetime
 from bson.binary import Binary
 import pickle
+from PIL import Image
+import io
 
 mongodb_pass = 'gobears'
 db_name = 'Main'
@@ -49,7 +52,37 @@ class Model(db.Document):
             "description": self.description,
             "date": self.date,
             "model": self.model
-        } 
+        }
+
+class Dataset(db.Document):
+    datasetid = db.StringField()
+    modelid = db.StringField()
+    apikey = db.StringField()
+    datasetname = db.StringField()
+    datatype = db.StringField()
+    size = db.StringField()
+    imgw = db.StringField()
+    imgh = db.StringField()
+    def to_json(self):
+        return {
+            "datasetid": self.datasetid,
+            "modelid": self.modelid,
+            "apikey": self.apikey, 
+            "datasetname": self.datasetname,
+            "datatype": self.datatype,
+            "size": self.size,
+            "imgw": self.imgw,
+            "imgh": self.imgh
+        }
+
+class Data(db.Document): 
+    apikey = db.StringField()
+    datasetid = db.StringField()
+    node = db.StringField()
+    binarynode = db.FileField()
+    classification = db.StringField()
+
+
 
 
 # class testset(db.Document):
@@ -114,7 +147,7 @@ def getall():
     else: 
         return make_response("Invalid API-KEY", 401)
 
-@app.route('/editmode', methods = ["POST"])
+@app.route('/editmodel', methods = ["POST"])
 def editmodel(): 
     apikey = request.headers.get('apikey')
     compkey = str(hashlib.sha1(apikey.encode('utf-8')).hexdigest())
@@ -132,7 +165,92 @@ def editmodel():
             return make_response("Cannot find model associated with model id: " + str(id), 400)
     else: 
         return make_response("Invalid API-KEY", 401)
- 
+
+@app.route('/appenddenselayer', methods = ["POST"])
+def appenddenselayer():
+    apikey = request.headers.get('apikey') 
+    return
+
+
+@app.route('/deletemodel', methods = ["DELETE"])
+def deletemodel(): 
+    apikey = request.headers.get('apikey')
+    id = str(request.args.get('id'))
+    compkey = str(hashlib.sha1(apikey.encode('utf-8')).hexdigest())
+    if User.objects(apikey = compkey):
+        if Model.objects(apikey = compkey, modelid = id):
+            val =  Model.objects(modelid = id, apikey = compkey).first()
+            val.delete()
+            return make_response("Success", 202)
+        else:
+            return make_response("Cannot find model associated with model id: " + str(id), 400)
+    else: 
+        return make_response("Invalid API-KEY", 401)
+
+
+@app.route('/createdataset', methods = ["PUT"])
+def createdataset():
+    apikey = request.headers.get('apikey')
+    compkey = str(hashlib.sha1(apikey.encode('utf-8')).hexdigest())
+    if User.objects(apikey = compkey):
+        datasetid = str(request.args.get('datasetid'))
+        modelid = str(request.args.get('modelid'))
+        datasetname = str(request.args.get('datasetname'))
+        datatype = str(request.args.get('datatype'))
+        if datatype == 'img':
+            width = str(request.args.get('imgw'))
+            height = str(request.args.get('imgh'))
+        if not Model.objects(modelid = modelid, apikey = compkey):
+            return make_response("Model ID associated with APIkey not found", 404)
+        if Dataset.objects(datasetname = datasetname) or Dataset.objects(datasetid = datasetid):
+            return make_response("Dataset ID or Dataset Name already exists", 409)
+        if datatype != 'img':
+            val = Dataset(datasetid = datasetid, modelid = modelid, apikey = compkey, datasetname = datasetname, datatype = datatype, size = '0')
+            val.save()
+            return make_response("Success", 201)
+        else:
+            val = Dataset(datasetid = datasetid, modelid = modelid, apikey = compkey, datasetname = datasetname, datatype = datatype, size = '0', imgw = width, imgh = height)
+            val.save()
+            return make_response("Success", 201)
+    else:
+        return make_response("Invalid API-KEY", 401)
+
+@app.route('/adddata', methods = ["PUT"])
+def adddata(): 
+    apikey = request.headers.get('apikey')
+    compkey = str(hashlib.sha1(apikey.encode('utf-8')).hexdigest())
+    if User.objects(apikey = compkey):
+        datasetid = str(request.args.get('datasetid'))
+        classif = str(request.args.get('classification'))
+        if (Dataset.objects(apikey = compkey, datasetid = datasetid)):
+            val = Dataset.objects(apikey = compkey, datasetid = datasetid).first() 
+            datatype = val.datatype
+            if datatype == "int" or datatype == "str":
+                data = str(request.args.get('data'))
+                if data == 'None' or classif == 'None':
+                    return make_response("Data or Classification not found", 404)
+                val = Data(apikey = compkey, datasetid = datasetid, node = data, classification = classif)
+                return make_response("Success", 201)
+            else:
+                binary = request.get_data()
+                print(classif)
+                if len(binary) < 3 or classif == 'None':
+                    return make_response("Image or Classification not found", 404)
+                else:
+                    val = Data(apikey = compkey, datasetid = datasetid, binarynode = binary, classification = classif)
+                    val.save()
+                # img = Image.open(io.BytesIO(binary))
+                # img_np = np.array(img)
+                return make_response("Success", 201)
+        else:
+            return make_response("Dataset associated with the datasetid not found", 404)
+    else:
+        return make_response("Invalid API-KEY", 401)
+
+
+
+    
+
 
 
 
