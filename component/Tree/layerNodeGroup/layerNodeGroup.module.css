@@ -1,0 +1,11 @@
+.container {
+  border-radius: 5px;
+  border-color: black;
+  border-style: solid;
+  border-width: medium;
+  height: 100%;
+  width: 9%;
+  display: inline-grid;
+  align-items: center;
+  justify-content: center;
+}

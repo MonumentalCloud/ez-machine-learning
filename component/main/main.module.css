@@ -1,0 +1,57 @@
+.container {
+  font-family: Helvetica-Neue, sans-serif;
+}
+
+.layer {
+  background-color: #68b6d3;
+  padding: 30px;
+  border-radius: 20px;
+  font-size: medium;
+  margin: 1em 0;
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  justify-content: space-evenly;
+}
+
+.layerVisualizer {
+  margin-top: 1em;
+  flex-direction: row;
+  display: flex;
+  background-color: #68b6d3;
+  padding: 20px;
+  align-items: stretch;
+  width: 80vw;
+  border-radius: 20px;
+}
+
+.button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.buttonIcon {
+  width: 30px;
+  height: 30px;
+  align-self: center;
+}
+
+.user {
+  background-color: #68b6d3;
+  border-radius: 20px;
+  padding: 30px;
+}
+
+.tree {
+  flex-direction: row;
+  display: flex;
+  background-color: #68b6d3;
+  padding: 30px;
+  border-radius: 20px;
+  margin-top: 1em;
+}
