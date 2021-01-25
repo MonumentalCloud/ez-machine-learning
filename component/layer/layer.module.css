@@ -1,14 +1,14 @@
 .container {
   width: stretch;
   height: 40vh;
-  background-color: #abdbe3;
+  background-color: rgb(214, 214, 214);
   margin: 10px;
-  border-radius: 10px;
   justify-content: center;
   align-items: center;
   padding: 1em;
   overflow-y: scroll;
-  font-family: Helvetica Neue;
+  font-weight: 100;
+  font-family: Helvetica;
 }
 
 .container ::-webkit-scrollbar {

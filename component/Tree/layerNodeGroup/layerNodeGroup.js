@@ -10,9 +10,9 @@ export default function LayerNodeGroup(props) {
             case 'dense':
                 return [...Array(data['node']).keys()].map(() => <Node />)
             case 'convolution':
-                return null
+                return [...Array(data['kernel']).keys()].map(() => <Node />)
             default:
-                return<p>pooling!</p>
+                return [...Array(data['poolSize']).keys()].map(() => <Node />)
         }
     }
 

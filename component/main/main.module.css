@@ -3,55 +3,70 @@
 }
 
 .layer {
-  background-color: #68b6d3;
+  background-color: whitesmoke;
   padding: 30px;
-  border-radius: 20px;
   font-size: medium;
   margin: 1em 0;
   flex-direction: row;
   display: flex;
   align-items: center;
   font-weight: bold;
-  justify-content: space-evenly;
+  justify-content: space-between;
+  box-shadow: 3px 3px 10px rgb(34, 34, 34);
 }
 
 .layerVisualizer {
   margin-top: 1em;
   flex-direction: row;
   display: flex;
-  background-color: #68b6d3;
+  background-color: whitesmoke;
   padding: 20px;
   align-items: stretch;
   width: 80vw;
-  border-radius: 20px;
+  box-shadow: 3px 3px 10px rgb(34, 34, 34);
 }
 
 .button {
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: 5px;
   align-items: center;
   justify-content: center;
+  background-color: #748dc3;
 }
 
 .buttonIcon {
   width: 30px;
   height: 30px;
   align-self: center;
+  color: white;
 }
 
 .user {
-  background-color: #68b6d3;
-  border-radius: 20px;
+  background-color: whitesmoke;
   padding: 30px;
+  box-shadow: 3px 3px 10px rgb(34, 34, 34);
+  font: Helvetica;
+  font-weight: 100;
 }
 
 .tree {
   flex-direction: row;
   display: flex;
-  background-color: #68b6d3;
+  background-color: whitesmoke;
   padding: 30px;
-  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
   margin-top: 1em;
+  box-shadow: 3px 3px 10px rgb(34, 34, 34);
+}
+
+.done {
+  background-color: whitesmoke;
+  padding: 30px;
+  font-size: medium;
+  margin: 1em 0;
+  border: none;
+  width: 80vw;
+  box-shadow: 3px 3px 10px rgb(34, 34, 34);
 }

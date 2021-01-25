@@ -4,25 +4,55 @@ import { FormGroup, Form, Input, Button } from 'reactstrap';
 import styles from './main.module.css';
 import Layer from '../layer/layer.js';
 import Tree from '../Tree/tree.js';
+import StartPage from '../startPage/startPage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
-
+import Image from 'next/image'
 
 export default function Main(props) {
     const [session, loading] = useSession();
     
     const [layer, setLayer] = useState(0);
     const [finalJSON, setFinalJSON] = useState([]);
+    const [token, setToken] = useState();
+    const [initiate, setInitiate] = useState(false);
+    const [id, setId] = useState();
+
+    const url = 'https://postmanai.herokuapp.com'
 
     useEffect(() => {
         console.log(finalJSON)
     },[finalJSON])
+
+    useEffect(() => {
+        if(session) {
+
+            fetch(`${url}/register`, {
+                method:'GET',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                }
+            })
+            .then(rawResp => rawResp.json())
+            .then(resp => setToken(resp))
+            .catch(err => console.log(err));
+        }
+    },[session])
 
     function handleRemove() {
         let current = finalJSON.slice();
         current.splice(-1, 1);
         setFinalJSON(current);
         setLayer(current.length);
+        // fetch(`https://postmanai.heroku.com/poplayer?modelid=${id}`, {
+        //     method: 'DEL',
+        //     headers: {
+        //         apikey: token
+        //     }
+        // })
+        // .catch(err => console.log(err))
     }
 
     const handleAdd = () => {
@@ -34,31 +64,29 @@ export default function Main(props) {
                 'type': 'dense',
                 'node' : 1,
                 'activation':'relu'
-            })
+            });
         }
     }
 
-    const handleClick = (e) => {
-        e.preventDefault(); 
-        const value = parseInt(e.target.value);
-        if(value) {
-            if(value> 10) {
-                setLayer(10);
-            } else if(value < 0){
-                setLayer(0);
-            } else {
-                setLayer(value);
+    const handleSubmit = () => {
+        finalJSON.map((layerData, index) => {
+            if(layerData['type'] === 'dense') {
+                fetch(`${url}/appenddenselayer?modelid=${id}&units=${layerData['node']}&activation=${layerData['activation']}&use_bias=true&name=dense-layer${index}`, {
+                    method: 'POST',
+                    headers: {
+                        apikey: token
+                    }
+                })
+
+            } else if(layerData['type'] === 'embedding') {
+                fetch(`${url}/appendembeddinglayer?modelid=${id}&input_dim=${layerData['input_dim']}&output_dim=${layerData['output_dim']}&input_len=${layerData['input_len']}&mask_zero=false`, {
+                    method: 'POST',
+                    headers: {
+                        apikey: token
+                    }
+                })
             }
-        } else {
-            setLayer(0);
-        }
-
-    }
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log(finalJSON)
-        return null;
+        })
     }
 
     return (
@@ -66,9 +94,12 @@ export default function Main(props) {
         <div className={styles.user}>
             {session.user.image && <img src={session.user.image} style={{width: '25px', borderRadius: "3px"}} />}
             <p>Hello! Welcome {session.user.name}</p>
-            <button onClick={signOut}>Sign Out</button>
+            <button style={{backgroundColor: "#748dc3", border: "none", fontWeight: "100", color: "white", borderRadius: "2px"}} onClick={signOut}>Sign Out</button>
         </div>
 
+        {
+            true?
+        (<div>
         <div className={styles.layerVisualizer}>
             {finalJSON.map((layer, index) => <Layer handleRemove={handleRemove} thisLayer={layer} setLayer={setLayer} key={index} number={index} json={finalJSON} set={setFinalJSON}/>)}
         </div>
@@ -76,18 +107,20 @@ export default function Main(props) {
         <div className={styles.layer}>
             <Button onClick={handleAdd} className={styles.button}><FontAwesomeIcon icon={faPlus} className={styles.buttonIcon}/></Button>
                 <label className=" form-control-label" htmlFor="example-number-input">
-                    Layer Number: {layer}
-                </label>
-                <br />            
+                    {layer}
+                </label>     
             <Button onClick={handleRemove} className={styles.button}> <FontAwesomeIcon icon={faMinus} className={styles.buttonIcon}/></Button>
         </div>
 
         <div className={styles.tree}>
-            <Tree json={finalJSON}/>
+            <Image src="/nn.png" width="970" height="600"/>
+            {/* <Tree json={finalJSON}/> */}
         </div>
-        <div>
-            <button type='submit' onClick={e => handleSubmit(e)}>Submit</button>
-        </div>
+        <button type="submit" onClick={handleSubmit} className={styles.done}>I'm done!</button>
+        </div>) :
+        <StartPage id={id} setId={setId} setInitiate={setInitiate} token={token}/>
+        }
+
 
     </div>
     )
